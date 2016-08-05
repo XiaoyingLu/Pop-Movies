@@ -28,7 +28,7 @@ public class MovieContract {
     public static final String PATH_FAVORITES = "favorites";
 
     // Column with the foreign key into the movies table.
-    public static final String COLUMN_MOVIE_KEY = "movie_id";
+    public static final String COLUMN_MOVIE_ID_KEY = "movie_id";
 
     /* Inner class that defines the table contents of the movies table */
     public static final class MovieEntry implements BaseColumns {
@@ -49,12 +49,24 @@ public class MovieContract {
         public static final String COLUMN_RELEASE_DATE = "release_date";
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
 
-        public static Uri buildMoviesUri(long id) {
+        private static final String[] COLUMNS = {_ID, COLUMN_ORIGINAL_TITLE, COLUMN_POSTER_PATH,
+                COLUMN_OVERVIEW, COLUMN_RELEASE_DATE, COLUMN_VOTE_AVERAGE};
+
+        public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+
+        public static Uri buildMovieWithOriginalTitle(String original_title) {
+            return CONTENT_URI.buildUpon().appendPath(original_title).build();
+        }
+
         public static long getIdFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(0));
+            return Long.parseLong(uri.getPathSegments().get(1));
+        }
+
+        public static String[] getColumns() {
+            return COLUMNS.clone();
         }
     }
 
@@ -72,8 +84,14 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "most_popular_movies";
 
+        private static final String[] COLUMNS = {_ID, COLUMN_MOVIE_ID_KEY};
+
         public static Uri buildMostPopularMoviesUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static String[] getColumns() {
+            return COLUMNS.clone();
         }
     }
 
@@ -92,8 +110,14 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "highest_rated_movies";
 
+        private static final String[] COLUMNS = {_ID, COLUMN_MOVIE_ID_KEY};
+
         public static Uri buildHighestRatedMoviesUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static String[] getColumns() {
+            return COLUMNS.clone();
         }
     }
 
@@ -111,8 +135,14 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "favorites";
 
+        private static final String[] COLUMNS = {_ID, COLUMN_MOVIE_ID_KEY};
+
         public static Uri buildFavoriteMoviesUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static String[] getColumns() {
+            return COLUMNS.clone();
         }
     }
 }

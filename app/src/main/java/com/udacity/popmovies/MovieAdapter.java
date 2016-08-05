@@ -1,6 +1,7 @@
 package com.udacity.popmovies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2016/6/4.
@@ -19,7 +18,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     final String PICTURE_SIZE = "w185";
     private final Context mContext;
     private final MovieAdapterOnClickHandler mClickHandler;
-    private ArrayList<Movie> mMovies;
+    private Cursor mCursor;
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
@@ -35,13 +34,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            mClickHandler.onClick(adapterPosition, this);
+            mCursor.moveToPosition(adapterPosition);
+            mClickHandler.onClick(mCursor.getLong(MovieFragment.COL_MOVIE_ID), this);
         }
 
     }
     public static interface MovieAdapterOnClickHandler {
 
-        void onClick(int position, MovieAdapterViewHolder vh);
+        void onClick(long id, MovieAdapterViewHolder vh);
     }
     public MovieAdapter(Context context, MovieAdapterOnClickHandler dh) {
         mContext = context;
@@ -62,27 +62,28 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
-        Movie movie = mMovies.get(position);
+        mCursor.moveToPosition(position);
+        String poster_path = mCursor.getString(MovieFragment.COL_MOVIE_POSTER_PATH);
+
         Picasso.with(mContext)
-                .load(PICTURE_BASE_URL + PICTURE_SIZE + "//" + movie.getPoster_path())
+                .load(PICTURE_BASE_URL + PICTURE_SIZE + "//" + poster_path)
                 .into(holder.mImageView);
     }
 
     @Override
     public int getItemCount() {
-        if (null == mMovies){
-            return 0;
-        }
-        return mMovies.size();
+        if (null == mCursor) return 0;
+        return mCursor.getCount();
     }
 
-    public void swapMovie(ArrayList<Movie> movies) {
-        mMovies = movies;
+    public void swapCursor(Cursor newCursor) {
+        mCursor = newCursor;
         notifyDataSetChanged();
+//        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
-    public ArrayList<Movie> getMovies() {
-        return mMovies;
+    public Cursor getCursor() {
+        return mCursor;
     }
 
     public void selectView(RecyclerView.ViewHolder viewHolder) {

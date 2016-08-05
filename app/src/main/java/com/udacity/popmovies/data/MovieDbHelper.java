@@ -31,34 +31,34 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_RELEASE_DATE + " INTEGER NOT NULL," +
-                MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL " +
                 " );";
 
         final String SQL_CREATE_MOST_POPULAR_MOVIES_TABLE = "CREATE TABLE " + MostPopularMoviesEntry.TABLE_NAME + " (" +
                 MostPopularMoviesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                MovieContract.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+                MovieContract.COLUMN_MOVIE_ID_KEY + " INTEGER NOT NULL, " +
 
                 // Set up the location column as a foreign key to location table.
-                " FOREIGN KEY (" + MovieContract.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + "), " +
+                " FOREIGN KEY (" + MovieContract.COLUMN_MOVIE_ID_KEY + ") REFERENCES " +
+                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + ") " +
                 " );";
 
         final String SQL_CREATE_HIGHEST_RATED_MOVIES_TABLE = "CREATE TABLE " + HighestRatedMoviesEntry.TABLE_NAME + " (" +
                 HighestRatedMoviesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                MovieContract.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+                MovieContract.COLUMN_MOVIE_ID_KEY + " INTEGER NOT NULL, " +
 
                 // Set up the location column as a foreign key to location table.
-                " FOREIGN KEY (" + MovieContract.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + "), " +
+                " FOREIGN KEY (" + MovieContract.COLUMN_MOVIE_ID_KEY + ") REFERENCES " +
+                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + ") " +
                 " );";
 
         final String SQL_CREATE_FAVORITE_TABLE = "CREATE TABLE " + FavoriteEntry.TABLE_NAME + " (" +
                 FavoriteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                MovieContract.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+                MovieContract.COLUMN_MOVIE_ID_KEY + " INTEGER NOT NULL, " +
 
                 // Set up the location column as a foreign key to location table.
-                " FOREIGN KEY (" + MovieContract.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + "), " +
+                " FOREIGN KEY (" + MovieContract.COLUMN_MOVIE_ID_KEY + ") REFERENCES " +
+                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + ") " +
                 " );";
 
 

@@ -1,9 +1,13 @@
 package com.udacity.popmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.udacity.popmovies.data.MovieContract;
+import com.udacity.popmovies.data.MovieContract.MovieEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,7 +19,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * Created by Xiaoying on 8/2/16.
@@ -23,7 +26,6 @@ import java.util.ArrayList;
 public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-    public static ArrayList<Movie> mMovies;
     private final Context mContext;
     private MovieAdapter mMovieAdapter;
 
@@ -86,7 +88,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             getMovieDataFromJson(movieJsonStr);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attemping
+            // If the code didn't successfully get the movie data, there's no point in attempting
             // to parse it.
             return null;
         } finally {
@@ -107,8 +109,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     private void getMovieDataFromJson(String movieJsonStr) {
 
         final String TM_RESULT = "results";
-        final String TM_POSTER = "poster_path";
         final String TM_ORIGINAL_TITLE = "original_title";
+        final String TM_POSTER = "poster_path";
         final String TM_OVERVIEW = "overview";
         final String TM_DATE = "release_date";
         final String TM_VOTE_AVERAGE = "vote_average";
@@ -117,33 +119,46 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             JSONObject movieJson = new JSONObject(movieJsonStr);
             JSONArray movieArray = movieJson.getJSONArray(TM_RESULT);
 
-            mMovies = new ArrayList<>();
+            // Insert the new movie information into the database
+//            Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
             for (int i = 0; i < movieArray.length(); i++) {
-                Movie movie = new Movie();
-                String poster_path;
+                // These are the values that will be collected.
                 String original_title;
+                String poster_path;
                 String overview;
                 String release_date;
-                String vote_average;
+                Double vote_average;
 
+                // Get the JSON object representing the movie
                 JSONObject movieDetail = movieArray.getJSONObject(i);
 
-                poster_path = movieDetail.getString(TM_POSTER);
                 original_title = movieDetail.getString(TM_ORIGINAL_TITLE);
+                poster_path = movieDetail.getString(TM_POSTER);
                 overview = movieDetail.getString(TM_OVERVIEW);
                 release_date = movieDetail.getString(TM_DATE);
-                vote_average = movieDetail.getString(TM_VOTE_AVERAGE);
+                vote_average = movieDetail.getDouble(TM_VOTE_AVERAGE);
 
-                movie.setPoster_path(poster_path);
-                movie.setOriginal_title(original_title);
-                movie.setOverview(overview);
-                movie.setRelease_date(release_date);
-                movie.setVote_average(vote_average);
+                ContentValues movieValues = new ContentValues();
 
-                mMovies.add(movie);
+                movieValues.put(MovieEntry.COLUMN_ORIGINAL_TITLE, original_title);
+                movieValues.put(MovieEntry.COLUMN_POSTER_PATH, poster_path);
+                movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+                movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, release_date);
+                movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, vote_average);
+
+//                cVVector.add(movieValues);
+                Uri uri = Utility.getSortedUri(mContext);
+                Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, movieValues);
+                long movie_id = MovieEntry.getIdFromUri(movieUri);
+                ContentValues entryValues = new ContentValues();
+                entryValues.put(MovieContract.COLUMN_MOVIE_ID_KEY, movie_id);
+                mContext.getContentResolver().insert(uri, entryValues);
             }
+
         } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
+
     }
 }

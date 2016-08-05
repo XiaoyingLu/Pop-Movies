@@ -53,7 +53,7 @@ public class MovieProvider extends ContentProvider {
         movieQueryBuilder.setTables(
                 tableName + " INNER JOIN " +
                         MovieContract.MovieEntry.TABLE_NAME +
-                        " ON " + tableName + "." + MovieContract.COLUMN_MOVIE_KEY +
+                        " ON " + tableName + "." + MovieContract.COLUMN_MOVIE_ID_KEY +
                         " = " + MovieContract.MovieEntry.TABLE_NAME +
                         "." + MovieContract.MovieEntry._ID);
         return movieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
@@ -189,7 +189,7 @@ public class MovieProvider extends ContentProvider {
             case MOVIES: {
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
                 if ( _id > 0 )
-                    returnUri = MovieContract.MovieEntry.buildMoviesUri(_id);
+                    returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
