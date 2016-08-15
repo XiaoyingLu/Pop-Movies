@@ -187,7 +187,8 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIES: {
-                long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
+                long _id = db.insertWithOnConflict(MovieContract.MovieEntry.TABLE_NAME, null,
+                        contentValues, SQLiteDatabase.CONFLICT_REPLACE);
                 if ( _id > 0 )
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
                 else
@@ -222,7 +223,6 @@ public class MovieProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
-        db.close();
         return returnUri;
     }
 

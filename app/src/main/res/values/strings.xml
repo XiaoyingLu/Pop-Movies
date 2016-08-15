@@ -5,13 +5,15 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="popular">most popular</string>
     <string name="rated">highest rated</string>
-    <string name="pref_popular_key">popular</string>
-    <string name="pref_rated_key">top_rated</string>
+    <string name="pref_popular_key">popularity.desc</string>
+    <string name="pref_rated_key">vote_average.desc</string>
     <string name="pref_sort_key" translatable="false">sort</string>
     <!-- Key name for storing sort class in SharedPreferences -->
     <string name="pref_sort_class_key" translatable="false">sort_class</string>
-    <string name="pref_sort_default" translatable="false">popular</string>
+    <string name="pref_sort_default" translatable="false">popularity.desc</string>
 
+    <!-- Error messages -->
+    <string name="error_failed_to_update_movies">Failed to update movies</string>
 
     <string name="vote_average"></string>
     <string name="content_authority">com.udacity.popmovies</string>

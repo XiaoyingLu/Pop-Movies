@@ -1,5 +1,9 @@
 package com.udacity.popmovies;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,19 +14,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.udacity.popmovies.data.MovieContract;
 
 /**
  * Created by Administrator on 2016/6/4.
  */
-public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     public static final String POSTER_PATH = "poster_path";
     public static final String ORIGINAL_TITLE = "original_title";
@@ -55,7 +62,35 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     static final int COL_MOVIE_OVERVIEW = 5;
     static final int COL_MOVIE_RELEASE_DATE = 6;
     static final int COL_MOVIE_VOTE_AVERAGE = 7;
+
+    private MovieNetHelper mMovieNetHelper;
     private int mPosition;
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(MovieNetHelper.BROADCAST_UPDATE_FINISHED)) {
+                if (!intent.getBooleanExtra(MovieNetHelper.EXTRA_IS_SUCCESSFUL_UPDATED, true)) {
+                    Toast.makeText(getContext(), R.string.error_failed_to_update_movies, Toast.LENGTH_SHORT)
+                            .show();
+//                    Snackbar.make(swipeRefreshLayout, R.string.error_failed_to_update_movies,
+//                            Snackbar.LENGTH_LONG)
+//                            .show();
+                }
+//                swipeRefreshLayout.setRefreshing(false);
+//                endlessRecyclerViewOnScrollListener.setLoading(false);
+//                updateGridLayout();
+            }
+        }
+    };
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if ( key.equals(R.string.pref_sort_class_key)){
+//            updateEmptyView();
+        }
+    }
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -73,6 +108,25 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mMovieNetHelper = new MovieNetHelper(getContext());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MovieNetHelper.BROADCAST_UPDATE_FINISHED);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, intentFilter);
+//        if (endlessRecyclerViewOnScrollListener != null) {
+//            endlessRecyclerViewOnScrollListener.setLoading(moviesService.isLoading());
+//        }
+//        swipeRefreshLayout.setRefreshing(moviesService.isLoading());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -97,22 +151,19 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateMovie();
-    }
-
     private void updateMovie() {
-        FetchMovieTask fetchMovieTask = new FetchMovieTask(getContext());
+//        FetchMovieTask fetchMovieTask = new FetchMovieTask(getContext());
         String sort = Utility.getPreferredSort(getActivity());
-        fetchMovieTask.execute(sort);
+//        fetchMovieTask.execute(sort);
+        mMovieNetHelper.updateMovies(sort);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
+
+        mMovieNetHelper.updateMovies(Utility.getPreferredSort(getContext()));
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_movie);
 
@@ -165,7 +216,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        int count = cursor.getCount();
         mMovieAdapter.swapCursor(cursor);
 //        updateEmptyView();
     }
@@ -181,5 +231,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         if (null != mRecyclerView) {
             mRecyclerView.clearOnScrollListeners();
         }
+    }
+
+    public void onSortChanged() {
+        updateMovie();
+        Loader loader = new Loader(getContext());
+        loader.startLoading();
     }
 }

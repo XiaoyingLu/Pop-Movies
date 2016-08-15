@@ -2,6 +2,7 @@ package com.udacity.popmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private final Context mContext;
     private final MovieAdapterOnClickHandler mClickHandler;
     private Cursor mCursor;
+    private final DataSetObserver mDataSetObserver;
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
@@ -46,6 +48,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public MovieAdapter(Context context, MovieAdapterOnClickHandler dh) {
         mContext = context;
         mClickHandler = dh;
+        mDataSetObserver = new NotifyingDataSetObserver();
+        if (mCursor != null) {
+            mCursor.registerDataSetObserver(mDataSetObserver);
+        }
     }
 
     @Override
@@ -77,7 +83,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     public void swapCursor(Cursor newCursor) {
+        if (null != mCursor && null != mDataSetObserver) {
+            mCursor.unregisterDataSetObserver(mDataSetObserver);
+        }
         mCursor = newCursor;
+        if (null != mCursor) {
+            if (null != mDataSetObserver) {
+                mCursor.registerDataSetObserver(mDataSetObserver);
+            }
+            notifyDataSetChanged();
+        } else {
+            notifyDataSetChanged();
+        }
         notifyDataSetChanged();
 //        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
@@ -90,6 +107,25 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         if (viewHolder instanceof MovieAdapterViewHolder) {
             MovieAdapterViewHolder vfh = (MovieAdapterViewHolder) viewHolder;
             vfh.onClick(vfh.itemView);
+        }
+    }
+
+    private class NotifyingDataSetObserver extends DataSetObserver {
+
+        public NotifyingDataSetObserver() {
+            super();
+        }
+
+        @Override
+        public void onChanged() {
+            super.onChanged();
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onInvalidated() {
+            super.onInvalidated();
+            notifyDataSetChanged();
         }
     }
 }
