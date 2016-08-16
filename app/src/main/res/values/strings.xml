@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">Pop Movies</string>
+    <string name="title_activity_detail">Detail</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="popular">most popular</string>
     <string name="rated">highest rated</string>
     <string name="pref_popular_key">popularity.desc</string>
@@ -11,6 +10,13 @@
     <!-- Key name for storing sort class in SharedPreferences -->
     <string name="pref_sort_class_key" translatable="false">sort_class</string>
     <string name="pref_sort_default" translatable="false">popularity.desc</string>
+    <string name="pref_favorite" translatable="false">My favorites</string>
+
+    <!-- Empty Movie Database -->
+    <string name="empty_movie_list">No Movie Information Available</string>
+    <string name="empty_movie_list_no_network">No Movie Information Available. The network is not available to fetch weather data.</string>
+    <string name="empty_movie_list_server_down">No Movie information available. The server is not returning data.</string>
+    <string name="empty_movie_list_server_error">No Movie information available. The server is not returning valid data. Please check for an updated version.</string>
 
     <!-- Error messages -->
     <string name="error_failed_to_update_movies">Failed to update movies</string>

@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -18,7 +17,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -129,27 +127,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
-        if(itemId == R.id.popular){
-            sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_popular_key)).commit();
-            updateMovie();
-            Loader loader = new Loader(getContext());
-            loader.startLoading();
-            return true;
-        }
-        if(itemId == R.id.rated){
-            sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_rated_key)).commit();
-            updateMovie();
-            Loader loader = new Loader(getContext());
-            loader.startLoading();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void updateMovie() {
 //        FetchMovieTask fetchMovieTask = new FetchMovieTask(getContext());

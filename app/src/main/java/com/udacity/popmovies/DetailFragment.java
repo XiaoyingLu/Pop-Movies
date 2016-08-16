@@ -49,6 +49,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mMovieVoteAverage;
     private TextView mMovieOverview;
 
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onTitleLoaded(String original_title);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -106,6 +118,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mMovieDate.setText(release_date);
             double vote_average = data.getDouble(COL_MOVIE_VOTE_AVERAGE);
             mMovieVoteAverage.setText(getActivity().getString(R.string.vote_average, vote_average));
+
+            ((Callback)getActivity()).onTitleLoaded(original_title);
         }
     }
 
