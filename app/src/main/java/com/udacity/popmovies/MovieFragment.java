@@ -19,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.udacity.popmovies.data.MovieContract;
@@ -85,10 +86,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if ( key.equals(R.string.pref_sort_class_key)){
-//            updateEmptyView();
+        if ( key.equals(R.string.pref_movies_status_key)){
+            updateEmptyView();
         }
     }
+
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -215,5 +217,29 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         updateMovie();
         Loader loader = new Loader(getContext());
         loader.startLoading();
+    }
+
+    private void updateEmptyView(){
+        if (mMovieAdapter.getItemCount() == 0){
+            TextView tv = (TextView) getView().findViewById(R.id.recyclerview_movie_empty);
+            if (null != tv){
+                // if cursor is empty, why? do we have an invalid location
+                int message = R.string.empty_movie_list;
+                @MovieNetHelper.MoviesStatus int movies_status = Utility.getMoviesStatus(getActivity());
+                switch (movies_status) {
+                    case MovieNetHelper.MOVIES_STATUS_SERVER_DOWN:
+                        message = R.string.empty_movie_list_server_down;
+                        break;
+                    case MovieNetHelper.MOVIES_STATUS_SERVER_INVALID:
+                        message = R.string.empty_movie_list_server_error;
+                        break;
+                    default:
+                        if (!Utility.isNetworkAvailable(getActivity())) {
+                            message = R.string.empty_movie_list_no_network;
+                        }
+                }
+                tv.setText(message);
+            }
+        }
     }
 }

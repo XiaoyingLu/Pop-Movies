@@ -2,6 +2,8 @@ package com.udacity.popmovies;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
@@ -35,5 +37,37 @@ public class Utility {
         } else {
             return null;
         }
+    }
+
+    static public boolean isNetworkAvailable(Context c){
+        ConnectivityManager cm =
+                (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    /**
+     *
+     * @param c
+     * @return
+     */
+    @SuppressWarnings("ResourceType")
+    static public @MovieNetHelper.MoviesStatus
+    int getMoviesStatus(Context c){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return sp.getInt(c.getString(R.string.pref_movies_status_key),
+                MovieNetHelper.MOVIES_STATUS_UNKNOWN);
+    }
+
+    /**
+     * Resets the location status. (Sets it to MovieNetHelper.MOVIES_STATUS_UNKNOWN)
+     * @param c Context used to get the SharedPreferences
+     */
+    static public void resetMoviesStatus(Context c){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(c.getString(R.string.pref_movies_status_key),
+                MovieNetHelper.MOVIES_STATUS_UNKNOWN);
+        spe.apply(); // not commit() cause this  method will be used in the UI thread
     }
 }

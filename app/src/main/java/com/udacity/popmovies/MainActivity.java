@@ -22,8 +22,10 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        if (null != toolbar) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
 
         mSort = Utility.getPreferredSort(this);
 

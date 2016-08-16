@@ -12,6 +12,8 @@
     <string name="pref_sort_default" translatable="false">popularity.desc</string>
     <string name="pref_favorite" translatable="false">My favorites</string>
 
+    <!-- Key name for storing location status in SharedPreferences -->
+    <string name="pref_movies_status_key" translatable="false">movies-status</string>
     <!-- Empty Movie Database -->
     <string name="empty_movie_list">No Movie Information Available</string>
     <string name="empty_movie_list_no_network">No Movie Information Available. The network is not available to fetch weather data.</string>

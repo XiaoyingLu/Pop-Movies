@@ -3,7 +3,10 @@ package com.udacity.popmovies;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -13,6 +16,8 @@ import com.udacity.popmovies.data.api.DiscoverResponse;
 import com.udacity.popmovies.data.api.MovieApi;
 import com.udacity.popmovies.data.api.MovieApiService;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import rx.Subscriber;
@@ -33,6 +38,19 @@ public class MovieNetHelper {
     private static final String LOG_TAG = MovieNetHelper.class.getSimpleName();
     public static final String BROADCAST_UPDATE_FINISHED = "UpdateFinished";
     public static final String EXTRA_IS_SUCCESSFUL_UPDATED = "isSuccessfulUpdated";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({MOVIES_STATUS_OK, MOVIES_STATUS_SERVER_DOWN, MOVIES_STATUS_SERVER_INVALID,
+            MOVIES_STATUS_UNKNOWN})
+    public @interface MoviesStatus {
+    }
+
+    public static final int MOVIES_STATUS_OK = 0;
+    public static final int MOVIES_STATUS_SERVER_DOWN = 1;
+    public static final int MOVIES_STATUS_SERVER_INVALID = 2;
+    public static final int MOVIES_STATUS_UNKNOWN = 3;
+//    public static final int MOVIES_STATUS_INVALID = 4;
+
 
     public MovieNetHelper(Context context) {
         mContext = context.getApplicationContext();
@@ -73,6 +91,11 @@ public class MovieNetHelper {
                 .map(new Func1<List<Movie>, Boolean>() {
                     @Override
                     public Boolean call(List<Movie> movies) {
+                        if (movies.size() == 0) {
+                            // Stream was empty.  No point in parsing.
+                            setMoviesStatus(mContext, MOVIES_STATUS_SERVER_DOWN);
+                            return null;
+                        }
                         for (int i = 0; i < movies.size(); i++) {
                             Uri movieUri = mContext.getContentResolver().insert(
                                     MovieContract.MovieEntry.CONTENT_URI,
@@ -91,12 +114,14 @@ public class MovieNetHelper {
                     @Override
                     public void onCompleted() {
                         loading = false;
+                        setMoviesStatus(mContext, MOVIES_STATUS_OK);
                         sendUpdateFinishedBroadcast(true);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         Log.e(LOG_TAG, e.getLocalizedMessage());
+                        setMoviesStatus(mContext, MOVIES_STATUS_SERVER_INVALID);
                         loading = false;
                         sendUpdateFinishedBroadcast(false);
                     }
@@ -166,5 +191,19 @@ public class MovieNetHelper {
         Intent intent = new Intent(BROADCAST_UPDATE_FINISHED);
         intent.putExtra(EXTRA_IS_SUCCESSFUL_UPDATED, successfulUpdated);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+    }
+
+    /**
+     * Sets the movies status into shared preference. This function should not be called from
+     * the UI thread because it uses commit to write to the shared preferences.
+     *
+     * @param c              Context to get the PreferenceManager from.
+     * @param moviesStatus The IntDef value to set
+     */
+    static private void setMoviesStatus(Context c, @MoviesStatus int moviesStatus) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(c.getString(R.string.pref_movies_status_key), moviesStatus);
+        spe.commit();
     }
 }

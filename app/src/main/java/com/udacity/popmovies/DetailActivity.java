@@ -21,9 +21,11 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         setContentView(R.layout.activity_detail);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_detail);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (null != toolbar) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         if (null == savedInstanceState) {
             getSupportFragmentManager().beginTransaction()
