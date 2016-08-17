@@ -19,6 +19,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     final String PICTURE_SIZE = "w185";
     private final Context mContext;
     private final MovieAdapterOnClickHandler mClickHandler;
+    private final View mEmptyView;
     private Cursor mCursor;
     private final DataSetObserver mDataSetObserver;
 
@@ -45,9 +46,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         void onClick(long id, MovieAdapterViewHolder vh);
     }
-    public MovieAdapter(Context context, MovieAdapterOnClickHandler dh) {
+    public MovieAdapter(Context context, MovieAdapterOnClickHandler dh, View emptyView) {
         mContext = context;
         mClickHandler = dh;
+        mEmptyView = emptyView;
         mDataSetObserver = new NotifyingDataSetObserver();
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
@@ -96,7 +98,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             notifyDataSetChanged();
         }
         notifyDataSetChanged();
-//        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     public Cursor getCursor() {

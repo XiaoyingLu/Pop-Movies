@@ -58,7 +58,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onTitleLoaded(String original_title);
+        public void onTitleLoaded(String original_title, String poster_path);
     }
 
     @Nullable
@@ -66,7 +66,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        mMovieTitle = (TextView) rootView.findViewById(R.id.textview_title);
         mMoviePoster = (ImageView) rootView.findViewById(R.id.imageview_poster);
         mMovieDate = (TextView) rootView.findViewById(R.id.textview_date);
         mMovieVoteAverage = (TextView) rootView.findViewById(R.id.textview_vote_average);
@@ -111,7 +110,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     .into(mMoviePoster);
 
             String original_title = data.getString(COL_MOVIE_ORIGINAL_TITLE);
-            mMovieTitle.setText(original_title);
             String overview = data.getString(COL_MOVIE_OVERVIEW);
             mMovieOverview.setText(overview);
             String release_date = data.getString(COL_MOVIE_RELEASE_DATE);
@@ -119,7 +117,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             double vote_average = data.getDouble(COL_MOVIE_VOTE_AVERAGE);
             mMovieVoteAverage.setText(getActivity().getString(R.string.vote_average, vote_average));
 
-            ((Callback)getActivity()).onTitleLoaded(original_title);
+            ((Callback)getActivity()).onTitleLoaded(original_title, poster_path);
         }
     }
 
