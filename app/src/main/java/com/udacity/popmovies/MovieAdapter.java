@@ -3,6 +3,7 @@ package com.udacity.popmovies;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        private final ImageView mImageView;
+        public final ImageView mImageView;
 
         public MovieAdapterViewHolder(View itemView) {
             super(itemView);
@@ -76,6 +77,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         Picasso.with(mContext)
                 .load(PICTURE_BASE_URL + PICTURE_SIZE + "//" + poster_path)
                 .into(holder.mImageView);
+
+        // this enables better animations. even if we lose state due to a device rotation,
+        // the animator can use this to re-find the original view
+        ViewCompat.setTransitionName(holder.mImageView, "posterView" + position);
     }
 
     @Override

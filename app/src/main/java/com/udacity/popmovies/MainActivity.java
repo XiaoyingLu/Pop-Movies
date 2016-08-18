@@ -5,10 +5,14 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity implements MovieFragment.Callback{
 
@@ -75,7 +79,11 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
 
         Intent intent = new Intent(this, DetailActivity.class)
                 .setData(contentUri);
-        startActivity(intent);
+
+        ActivityOptionsCompat activityOptions =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                        new Pair<View, String>(vh.mImageView, getString(R.string.detail_poster_transition_name)));
+        ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
     }
 
     @Override

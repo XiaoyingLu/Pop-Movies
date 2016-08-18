@@ -44,9 +44,20 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         mBackDrop = (ImageView) findViewById(R.id.back_drop);
 
         if (null == savedInstanceState) {
+
+            Bundle arguments = new Bundle();
+//            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+            arguments.putBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, true);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(arguments);
+
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_detail, new DetailFragment())
+                    .add(R.id.fragment_detail, fragment)
                     .commit();
+
+            // Being here means we are in animation mode
+            supportPostponeEnterTransition();
         }
     }
 

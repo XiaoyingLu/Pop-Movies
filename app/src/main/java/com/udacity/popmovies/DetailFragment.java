@@ -26,6 +26,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     final String PICTURE_BASE_URL = "http://image.tmdb.org/t/p/";
     final String PICTURE_SIZE = "w185";
     private static final int DETAIL_LOADER = 0;
+    static final String DETAIL_TRANSITION_ANIMATION = "DTA";
 
     private static final String[] DETAIL_COLUMNS = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
@@ -48,6 +49,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mMovieDate;
     private TextView mMovieVoteAverage;
     private TextView mMovieOverview;
+    private boolean mTransitionAnimation;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -64,6 +66,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if(arguments != null){
+//            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+            mTransitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, false);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         mMoviePoster = (ImageView) rootView.findViewById(R.id.imageview_poster);
@@ -118,6 +126,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mMovieVoteAverage.setText(getActivity().getString(R.string.vote_average, vote_average));
 
             ((Callback)getActivity()).onTitleLoaded(original_title, poster_path);
+        }
+
+        if ( mTransitionAnimation ) {
+            getActivity().supportStartPostponedEnterTransition();
         }
     }
 

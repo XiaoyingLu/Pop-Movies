@@ -24,7 +24,8 @@
                     android:id="@+id/imageview_poster"
                     android:layout_width="140dp"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/sample"/>
+                    android:src="@drawable/sample"
+                    android:transitionName="@string/detail_poster_transition_name"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

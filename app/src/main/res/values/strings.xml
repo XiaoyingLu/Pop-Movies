@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Pop Movies</string>
     <string name="title_activity_detail">Detail</string>
+    <string name="detail_poster_transition_name" translatable="false">TN_DetailPoster</string>
 
     <string name="popular">most popular</string>
     <string name="rated">highest rated</string>
