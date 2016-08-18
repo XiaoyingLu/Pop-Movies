@@ -60,6 +60,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieContract.MovieEntry.COLUMN_BACKDROP_PATH,
     };
 
     // These indices are tied to MOVIE_COLUMNS. If MOVIE_COLUMNS changes, these must change.
@@ -71,6 +72,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     static final int COL_MOVIE_OVERVIEW = 5;
     static final int COL_MOVIE_RELEASE_DATE = 6;
     static final int COL_MOVIE_VOTE_AVERAGE = 7;
+    static final int COL_MOVIE_BACKDROP_PATH = 8;
 
     private MovieNetHelper mMovieNetHelper;
     private int mPosition;

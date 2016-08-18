@@ -1,7 +1,7 @@
 package com.udacity.popmovies;
 
-import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -24,8 +25,9 @@ import com.udacity.popmovies.data.MovieContract;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     final String PICTURE_BASE_URL = "http://image.tmdb.org/t/p/";
-    final String PICTURE_SIZE = "w185";
+    final String PICTURE_SIZE = "w780";
     private static final int DETAIL_LOADER = 0;
+    static final String DETAIL_URI = "URI";
     static final String DETAIL_TRANSITION_ANIMATION = "DTA";
 
     private static final String[] DETAIL_COLUMNS = {
@@ -35,6 +37,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieContract.MovieEntry.COLUMN_BACKDROP_PATH
     };
 
     // These indices are tied to DETAIL_COLUMNS. If DETAIL_COLUMNS changes, these must change.
@@ -44,12 +47,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_MOVIE_OVERVIEW = 3;
     static final int COL_MOVIE_RELEASE_DATE = 4;
     static final int COL_MOVIE_VOTE_AVERAGE = 5;
+    static final int COL_MOVIE_BACKDROP_PATH = 6;
     private TextView mMovieTitle;
     private ImageView mMoviePoster;
     private TextView mMovieDate;
     private TextView mMovieVoteAverage;
     private TextView mMovieOverview;
     private boolean mTransitionAnimation;
+    private Uri mUri;
+    private RatingBar mMovieVoteRate;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -60,7 +66,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onTitleLoaded(String original_title, String poster_path);
+        public void onTitleLoaded(String original_title, String backdrop_path);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Nullable
@@ -68,14 +80,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle arguments = getArguments();
         if(arguments != null){
-//            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
             mTransitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, false);
         }
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         mMoviePoster = (ImageView) rootView.findViewById(R.id.imageview_poster);
+        mMovieTitle = (TextView) rootView.findViewById(R.id.textview_title);
         mMovieDate = (TextView) rootView.findViewById(R.id.textview_date);
+        mMovieVoteRate = (RatingBar) rootView.findViewById(R.id.rating_vote);
         mMovieVoteAverage = (TextView) rootView.findViewById(R.id.textview_vote_average);
         mMovieOverview = (TextView) rootView.findViewById(R.id.textview_overview);
 
@@ -91,18 +105,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
-        if (intent == null || intent.getData() == null){
-            return null;
-        }
 
-        return new CursorLoader(getActivity(),
-                intent.getData(),
-                DETAIL_COLUMNS,
-                null,
-                null,
-                null
-        );
+        if (null != mUri) {
+            return new CursorLoader(getActivity(),
+                    mUri,
+                    DETAIL_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+        }
+        return null;
     }
 
     @Override
@@ -118,14 +131,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     .into(mMoviePoster);
 
             String original_title = data.getString(COL_MOVIE_ORIGINAL_TITLE);
+            mMovieTitle.setText(original_title);
             String overview = data.getString(COL_MOVIE_OVERVIEW);
             mMovieOverview.setText(overview);
             String release_date = data.getString(COL_MOVIE_RELEASE_DATE);
             mMovieDate.setText(release_date);
             double vote_average = data.getDouble(COL_MOVIE_VOTE_AVERAGE);
+            mMovieVoteRate.setRating((float) (vote_average));
             mMovieVoteAverage.setText(getActivity().getString(R.string.vote_average, vote_average));
+            String backdrop_path = data.getString(COL_MOVIE_BACKDROP_PATH);
 
-            ((Callback)getActivity()).onTitleLoaded(original_title, poster_path);
+            ((Callback)getActivity()).onTitleLoaded(original_title, backdrop_path);
         }
 
         if ( mTransitionAnimation ) {

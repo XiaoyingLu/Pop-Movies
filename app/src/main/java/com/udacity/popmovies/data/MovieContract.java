@@ -48,9 +48,10 @@ public class MovieContract {
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_RELEASE_DATE = "release_date";
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
+        public static final String COLUMN_BACKDROP_PATH = "backdrop_path";
 
         private static final String[] COLUMNS = {_ID, COLUMN_ORIGINAL_TITLE, COLUMN_POSTER_PATH,
-                COLUMN_OVERVIEW, COLUMN_RELEASE_DATE, COLUMN_VOTE_AVERAGE};
+                COLUMN_OVERVIEW, COLUMN_RELEASE_DATE, COLUMN_VOTE_AVERAGE, COLUMN_BACKDROP_PATH};
 
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

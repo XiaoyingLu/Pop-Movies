@@ -94,9 +94,9 @@ public class TestDb extends AndroidTestCase {
             columnHashSet.remove(columnName);
         } while(c.moveToNext());
 
-        // if this fails, it means that your database doesn't contain all of the required location
+        // if this fails, it means that your database doesn't contain all of the required movie
         // entry columns
-        assertTrue("Error: The database doesn't contain all of the required location entry columns",
+        assertTrue("Error: The database doesn't contain all of the required movie entry columns",
                 columnHashSet.isEmpty());
     }
 

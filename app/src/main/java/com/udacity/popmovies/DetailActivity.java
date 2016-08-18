@@ -9,6 +9,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.ImageView;
 
@@ -23,7 +24,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     private CollapsingToolbarLayout mCollapsingToolbar;
     private ImageView mBackDrop;
     final String PICTURE_BASE_URL = "http://image.tmdb.org/t/p/";
-    final String PICTURE_SIZE = "w185";
+    final String BACKDROP_SIZE = "w780";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -34,6 +35,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        Log.d("DetailActivity", "onCreate");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -46,16 +48,17 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         if (null == savedInstanceState) {
 
             Bundle arguments = new Bundle();
-//            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
             arguments.putBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, true);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(arguments);
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_detail, fragment)
-                    .commit();
-
+            if(!fragment.isAdded()) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_detail, fragment)
+                        .commit();
+            }
             // Being here means we are in animation mode
             supportPostponeEnterTransition();
         }
@@ -63,17 +66,17 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
-    public void onTitleLoaded(String original_title, String poster_path) {
+    public void onTitleLoaded(String original_title, String backdrop_path) {
         mCollapsingToolbar.setTitle(original_title);
 
-        Picasso.with(this).load(PICTURE_BASE_URL + PICTURE_SIZE + "//" + poster_path).
-                into(mBackDrop, new Callback() {
+        Picasso.with(this).load(PICTURE_BASE_URL + BACKDROP_SIZE + "//" + backdrop_path)
+                .into(mBackDrop, new Callback() {
                     @Override
                     public void onSuccess() {
                         Bitmap bitmap = ((BitmapDrawable) mBackDrop.getDrawable()).getBitmap();
                         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                             public void onGenerated(Palette palette) {
-//                                applyPalette(palette);
+                                applyPalette(palette);
                             }
                         });
                     }
@@ -101,5 +104,12 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 //
 //        fab.setRippleColor(lightVibrantColor);
 //        fab.setBackgroundTintList(ColorStateList.valueOf(vibrantColor));
+//    }
+
+
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        getSupportFragmentManager().putFragment(savedInstanceState);
 //    }
 }

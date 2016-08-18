@@ -14,7 +14,7 @@ import com.udacity.popmovies.data.MovieContract.HighestRatedMoviesEntry;
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -31,7 +31,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_RELEASE_DATE + " INTEGER NOT NULL," +
-                MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL " +
+                MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_BACKDROP_PATH + " TEXT " +
                 " );";
 
         final String SQL_CREATE_MOST_POPULAR_MOVIES_TABLE = "CREATE TABLE " + MostPopularMoviesEntry.TABLE_NAME + " (" +

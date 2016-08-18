@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             xmlns:app="http://schemas.android.com/apk/res-auto">
+             android:layout_height="match_parent">
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll"
@@ -19,65 +20,146 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp">
+                android:padding="@dimen/padding_size">
                 <com.udacity.popmovies.widget.SquareImageView
                     android:id="@+id/imageview_poster"
                     android:layout_width="140dp"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/sample"
                     android:transitionName="@string/detail_poster_transition_name"/>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_toRightOf="@id/imageview_poster"
                     android:orientation="vertical"
                     android:paddingLeft="20dp">
                     <TextView
-                        android:id="@+id/textview_date"
-                        android:layout_width="match_parent"
+                        android:id="@+id/textview_title"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2015"
-                        android:textSize="30sp"/>
+                        android:fontFamily="sans-serif"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        android:textColor="@color/primary_text"
+                        tools:text="One Good Turn"/>
                     <TextView
-                        android:id="@+id/textview_time"
-                        android:layout_width="match_parent"
+                        android:id="@+id/textview_date"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="120min"
-                        android:textSize="30sp"/>
+                        android:fontFamily="sans-serif"
+                        android:textColor="@color/secondary_text"
+                        tools:text="1931-10-31"/>
+                    <RatingBar
+                        android:id="@+id/rating_vote"
+                        style="@style/ratingbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/padding_size"
+                        android:numStars="5"
+                        android:stepSize="0.5"
+                        android:padding="0dp"/>
                     <TextView
                         android:id="@+id/textview_vote_average"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
                         android:text="8.1/10"
+                        android:textColor="@color/secondary_text"
                         android:textSize="15sp"/>
-                    <Button
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:text="MARK AS FAVORITE"/>
                 </LinearLayout>
+                <ImageButton
+                    android:id="@+id/movie_favorite_button"
+                    style="@style/FavoriteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:baselineAlignBottom="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentBottom="true"
+                    android:contentDescription="@string/movie_item_btn_favorite_desc"
+                    android:tint="@color/primary"/>
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/textview_overview"
+            <LinearLayout
+                android:id="@+id/ll_overview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="Based upon Marvel Comics’ most unconventional anti-hero, DEADPOOL tells the origin story of former Special Forces operative turned mercenary Wade Wilson, who after being subjected to a rogue experiment that leaves him with accelerated healing powers, adopts the alter ego Deadpool. Armed with his new abilities and a dark, twisted sense of humor, Deadpool hunts down the man who nearly destroyed his life."/>
+                android:orientation="vertical"
+                android:padding="@dimen/padding_size">
+
+                <TextView
+                    android:id="@+id/textview_overview_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/movie_overview_title"
+                    android:textColor="@color/primary_text"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/textview_overview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    tools:text="A plot synopsis (called overview in the api)"
+                    android:textColor="@color/secondary_text"/>
+
+            </LinearLayout>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
                 android:layout_margin="10dp"
                 android:background="@android:color/black"/>
-            <TextView
-                android:id="@+id/textview_trailers"
+
+            <LinearLayout
+                android:id="@+id/ll_videos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="Trailers"/>
-            <ListView
+                android:orientation="vertical"
+                android:padding="@dimen/padding_size">
+
+                <TextView
+                    android:id="@+id/textview_videos_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/movie_videos_title"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_text"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_movie_videos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                </android.support.v7.widget.RecyclerView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_reviews"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </ListView>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/padding_size">
+
+                <TextView
+                    android:id="@+id/textview_reviews_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/movie_reviews_title"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_text"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_movie_reviews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                </android.support.v7.widget.RecyclerView>
+
+            </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </FrameLayout>

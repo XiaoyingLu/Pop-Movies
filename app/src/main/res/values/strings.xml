@@ -23,6 +23,11 @@
 
     <!-- Error messages -->
     <string name="error_failed_to_update_movies">Failed to update movies</string>
+    <string name="content_description_movie_backdrop">Movie backdrop</string>
+    <string name="movie_item_btn_favorite_desc">Movie favorite button</string>
+    <string name="movie_overview_title">Overview</string>
+    <string name="movie_videos_title">Videos</string>
+    <string name="movie_reviews_title">Reviews</string>
 
     <string name="vote_average"></string>
     <string name="content_authority">com.udacity.popmovies</string>
