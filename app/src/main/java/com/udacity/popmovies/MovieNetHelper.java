@@ -206,4 +206,52 @@ public class MovieNetHelper {
         spe.putInt(c.getString(R.string.pref_movies_status_key), moviesStatus);
         spe.commit();
     }
+
+//    public void callMovieVideos(long id, MovieVideosAdapter movieVideosAdapter) {
+//        MovieApi service = MovieApiService.getMovieApi(mContext);
+//        service.getMovieVideos(id)
+//                .subscribeOn(Schedulers.newThread())
+//                .map(MovieVideosResponse::getResults)
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Subscriber<ArrayList<MovieVideo>>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(LOG_TAG, e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onNext(ArrayList<MovieVideo> movieVideos) {
+//                        movieVideosAdapter.setMovieVideos(movieVideos);
+//                    }
+//                });
+//    }
+//
+//    public void callMovieReviews(long id, MovieReviewsAdapter movieReviewsAdapter) {
+//        MovieApi service = MovieApiService.getMovieApi(mContext);
+//        service.getMovieReviews(id)
+//                .subscribeOn(Schedulers.newThread())
+//                .map(MovieReviewsResponse::getResults)
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Subscriber<ArrayList<MovieReview>>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(LOG_TAG, e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onNext(ArrayList<MovieReview> movieReviews) {
+//                        movieReviewsAdapter.setMovieReviews(movieReviews);
+//                    }
+//                });
+//    }
 }

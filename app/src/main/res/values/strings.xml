@@ -28,6 +28,7 @@
     <string name="movie_overview_title">Overview</string>
     <string name="movie_videos_title">Videos</string>
     <string name="movie_reviews_title">Reviews</string>
+    <string name="content_description_movie_video">Movie video image</string>
 
     <string name="vote_average"></string>
     <string name="content_authority">com.udacity.popmovies</string>

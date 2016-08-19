@@ -113,7 +113,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Uri dataUri, MovieAdapter.MovieAdapterViewHolder vh);
+        public void onItemSelected(long id, Uri dataUri, MovieAdapter.MovieAdapterViewHolder vh);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             public void onClick(long id, MovieAdapter.MovieAdapterViewHolder vh) {
 
                 ((Callback)getActivity())
-                        .onItemSelected(MovieContract.MovieEntry.buildMovieUri(id), vh);
+                        .onItemSelected(id, MovieContract.MovieEntry.buildMovieUri(id), vh);
                 mPosition = vh.getAdapterPosition();
             }
         }, mEmptyView);

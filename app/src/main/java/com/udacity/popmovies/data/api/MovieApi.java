@@ -20,4 +20,10 @@ public interface MovieApi {
     @GET("discover/movie")
     Observable<DiscoverResponse<Movie>> discoverMovies(@Query("sort_by") String sortBy, @Query("page") Integer page);
 
+    //https://api.themoviedb.org/3/movie/297761/videos?api_key=###
+    @GET("movie/{id}/videos")
+    Observable<MovieVideosResponse> getMovieVideos(@Path("id") long movieId);
+
+    @GET("movie/{id}/reviews")
+    Observable<MovieReviewsResponse> getMovieReviews(@Path("id") long movieId);
 }

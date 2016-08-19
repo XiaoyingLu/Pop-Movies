@@ -75,10 +75,11 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     }
 
     @Override
-    public void onItemSelected(Uri contentUri, MovieAdapter.MovieAdapterViewHolder vh) {
+    public void onItemSelected(long id, Uri contentUri, MovieAdapter.MovieAdapterViewHolder vh) {
 
         Intent intent = new Intent(this, DetailActivity.class)
-                .setData(contentUri);
+                .setData(contentUri)
+                .putExtra(DetailFragment.MOVIE_ID, id);
 
         ActivityOptionsCompat activityOptions =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(this,
