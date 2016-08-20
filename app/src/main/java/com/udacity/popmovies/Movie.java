@@ -32,7 +32,7 @@ public class Movie implements Parcelable{
     @SerializedName("release_date")
     String release_date;
     @SerializedName("vote_average")
-    String vote_average;
+    double vote_average;
     @SerializedName("backdrop_path")
     private String backdrop_path;
 
@@ -42,7 +42,7 @@ public class Movie implements Parcelable{
         overview = in.readString();
         original_title = in.readString();
         release_date = in.readString();
-        vote_average = in.readString();
+        vote_average = in.readDouble();
         backdrop_path = in.readString();
     }
 
@@ -86,11 +86,11 @@ public class Movie implements Parcelable{
         this.release_date = release_date;
     }
 
-    public String getVote_average() {
+    public double getVote_average() {
         return vote_average;
     }
 
-    public void setVote_average(String vote_average) {
+    public void setVote_average(double vote_average) {
         this.vote_average = vote_average;
     }
 
@@ -126,7 +126,7 @@ public class Movie implements Parcelable{
         parcel.writeString(overview);
         parcel.writeString(original_title);
         parcel.writeString(release_date);
-        parcel.writeString(vote_average);
+        parcel.writeDouble(vote_average);
         parcel.writeString(backdrop_path);
     }
 }

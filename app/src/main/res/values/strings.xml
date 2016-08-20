@@ -32,4 +32,6 @@
 
     <string name="vote_average"></string>
     <string name="content_authority">com.udacity.popmovies</string>
+
+    <string name="action_share">Share</string>
 </resources>

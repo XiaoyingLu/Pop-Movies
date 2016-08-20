@@ -1,6 +1,7 @@
 package com.udacity.popmovies;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;
@@ -25,10 +27,25 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     private ImageView mBackDrop;
     final String PICTURE_BASE_URL = "http://image.tmdb.org/t/p/";
     final String BACKDROP_SIZE = "w780";
+    private String mMovie;
+    private static final String MOVIE_SHARE_HASHTAG = " #PopMoviesApp";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_share) {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, mMovie + MOVIE_SHARE_HASHTAG);
+            item.setIntent(shareIntent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -87,6 +104,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
                     }
                 });
 
+        mMovie = original_title;
     }
 
     private void applyPalette(Palette palette) {
