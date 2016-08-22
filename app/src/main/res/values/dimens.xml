@@ -8,4 +8,9 @@
     <dimen name="padding_top">8dp</dimen>
     <dimen name="movie_video_item_offset">5dp</dimen>
     <dimen name="detail_card_elevation">2dp</dimen>
+
+    <integer name="grid_column_num">2</integer>
+
+    <dimen name="movie_detail_content_overlay">0dp</dimen>
+    <dimen name="movie_detail_cards_margin_left_right">0dp</dimen>
 </resources>

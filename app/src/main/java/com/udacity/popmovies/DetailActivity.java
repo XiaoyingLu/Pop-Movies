@@ -10,7 +10,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -52,7 +51,6 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        Log.d("DetailActivity", "onCreate");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,11 +64,11 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
 
             Bundle arguments = new Bundle();
             arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+            arguments.putLong(DetailFragment.MOVIE_ID, getIntent().getLongExtra(DetailFragment.MOVIE_ID, 0));
             arguments.putBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, true);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(arguments);
-
             if(!fragment.isAdded()) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_detail, fragment)
@@ -113,7 +111,7 @@ public class DetailActivity extends AppCompatActivity implements DetailFragment.
         mCollapsingToolbar.setContentScrimColor(palette.getMutedColor(primary));
         mCollapsingToolbar.setStatusBarScrimColor(palette.getDarkMutedColor(primaryDark));
 //        updateBackground((FloatingActionButton) findViewById(R.id.fab), palette);
-//        supportStartPostponedEnterTransition();
+        supportStartPostponedEnterTransition();
     }
 
 //    private void updateBackground(FloatingActionButton fab, Palette palette) {

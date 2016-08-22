@@ -78,6 +78,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private CardView mCardMovieReviews;
     private MovieVideosAdapter mMovieVideosAdapter;
     private MovieReviewsAdapter mMovieReviewsAdapter;
+    private long mId = 0;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -103,6 +104,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Bundle arguments = getArguments();
         if(arguments != null){
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+            mId = arguments.getLong(DetailFragment.MOVIE_ID);
             mTransitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, false);
         }
 
@@ -119,9 +121,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mCardMovieReviews = (CardView) rootView.findViewById(R.id.movie_reviews_container);
         mMovieReviews = (RecyclerView) rootView.findViewById(R.id.recyclerview_movie_reviews);
 
-        long id = getActivity().getIntent().getLongExtra(MOVIE_ID, 0);
-        initMovieVideos(id);
-        initMovieReviews(id);
+        if (mId != 0) {
+            initMovieVideos(mId);
+            initMovieReviews(mId);
+        }
 
         return rootView;
     }

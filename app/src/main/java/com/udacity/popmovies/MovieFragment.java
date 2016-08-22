@@ -23,6 +23,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,6 +163,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.e("MF", "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
 
         mMovieNetHelper.updateMovies(Utility.getPreferredSort(getContext()));
@@ -170,7 +172,8 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         mEmptyView = (TextView) rootView.findViewById(R.id.recyclerview_movie_empty);
 
         // Set the layout manager
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        int grid_column_num = getResources().getInteger(R.integer.grid_column_num);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), grid_column_num));
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
