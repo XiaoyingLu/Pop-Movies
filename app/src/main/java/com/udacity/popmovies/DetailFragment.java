@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -79,6 +81,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private MovieVideosAdapter mMovieVideosAdapter;
     private MovieReviewsAdapter mMovieReviewsAdapter;
     private long mId = 0;
+    private ImageButton mMovieFavorite;
+    private FavoriteService favoriteService;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -96,6 +100,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMovieNetHelper = new MovieNetHelper(getContext());
+        favoriteService = new FavoriteService(getActivity());
     }
 
     @Nullable
@@ -115,6 +120,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mMovieDate = (TextView) rootView.findViewById(R.id.textview_date);
         mMovieVoteRate = (RatingBar) rootView.findViewById(R.id.rating_vote);
         mMovieVoteAverage = (TextView) rootView.findViewById(R.id.textview_vote_average);
+        mMovieFavorite = (ImageButton) rootView.findViewById(R.id.movie_favorite_button);
         mMovieOverview = (TextView) rootView.findViewById(R.id.textview_overview);
         mCardMovieVideos = (CardView) rootView.findViewById(R.id.movie_videos_container);
         mMovieVideos = (RecyclerView) rootView.findViewById(R.id.recyclerview_movie_videos);
@@ -127,6 +133,24 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mMovieFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMovieFavorite.setSelected(!favoriteService.isFavorite(mId));
+                if(favoriteService.isFavorite(mId)){
+                    favoriteService.removeFromFavorite(mId);
+                    Snackbar.make(view, "Removed from favorite", Snackbar.LENGTH_SHORT).show();
+                }else {
+                    favoriteService.addToFavorite(mId);
+                    Snackbar.make(view, "Added to favorite", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void initMovieVideos(long id) {
@@ -277,10 +301,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             String release_date = data.getString(COL_MOVIE_RELEASE_DATE);
             mMovieDate.setText("Release date: " + release_date);
             String vote_average = data.getString(COL_MOVIE_VOTE_AVERAGE);
-            mMovieVoteAverage.setText("Average rating: "+ vote_average);
+            mMovieVoteAverage.setText("Average rating: " + vote_average);
             mMovieVoteRate.setMax(10);
             mMovieVoteRate.setRating(Float.parseFloat(vote_average));
             String backdrop_path = data.getString(COL_MOVIE_BACKDROP_PATH);
+            long id = data.getLong(COL_MOVIE_ID);
+            mMovieFavorite.setSelected(favoriteService.isFavorite(id));
+
 
             ((Callback)getActivity()).onTitleLoaded(original_title, backdrop_path);
         }

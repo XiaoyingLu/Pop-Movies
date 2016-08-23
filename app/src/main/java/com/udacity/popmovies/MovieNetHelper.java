@@ -69,7 +69,7 @@ public class MovieNetHelper {
             Log.e(LOG_TAG, "Wrong uri: " +uri);
             return;
         }
-        Log.d(LOG_TAG, uri.toString());
+        Log.e(LOG_TAG, uri.toString());
 
         service.discoverMovies(sort, page)
                 .subscribeOn(Schedulers.newThread())
@@ -84,7 +84,7 @@ public class MovieNetHelper {
                                     null
                             );
                         }
-                        Log.d(LOG_TAG, "page == " + page + ", " + movieDiscoverResponse.getResults().toString());
+                        Log.e(LOG_TAG, "page == " + page + ", " + movieDiscoverResponse.getResults().toString());
                         return movieDiscoverResponse.getResults();
                     }
                 })
@@ -102,10 +102,13 @@ public class MovieNetHelper {
                                     movies.get(i).toContentValues());
 
                             long movie_id = MovieContract.MovieEntry.getIdFromUri(movieUri);
+                            Log.e(LOG_TAG, String.valueOf(movie_id));
                             ContentValues entryValues = new ContentValues();
                             entryValues.put(MovieContract.COLUMN_MOVIE_ID_KEY, movie_id);
                             mContext.getContentResolver().insert(uri, entryValues);
+                            Log.e(LOG_TAG, uri.toString());
                         }
+                        Log.e(LOG_TAG, movies.toString());
                         return true;
                     }
                 })
@@ -191,6 +194,7 @@ public class MovieNetHelper {
         Intent intent = new Intent(BROADCAST_UPDATE_FINISHED);
         intent.putExtra(EXTRA_IS_SUCCESSFUL_UPDATED, successfulUpdated);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        Log.e(LOG_TAG, "sendUpdateFinishedBroadcast-------------" + successfulUpdated);
     }
 
     /**

@@ -12,8 +12,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -25,6 +27,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -37,7 +40,7 @@ import com.udacity.popmovies.data.MovieContract;
  * Created by Administrator on 2016/6/4.
  */
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-        SharedPreferences.OnSharedPreferenceChangeListener{
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String POSTER_PATH = "poster_path";
     public static final String ORIGINAL_TITLE = "original_title";
@@ -51,6 +54,9 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     private boolean mHoldForTransition;
 
     private static final int MOVIE_LOADER = 0;
+    public static final int MOVIE_FAVORITE_LOADER = 1;
+    public static String FAVORIE_LOADER = "movie_favorite_loader";
+
     private static final String COLUMN_SORTED_ID = "sorted_id";
     private static final String[] MOVIE_COLUMNS = {
             COLUMN_SORTED_ID,
@@ -77,6 +83,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     private MovieNetHelper mMovieNetHelper;
     private int mPosition;
+    private FavoriteService favoriteService;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -93,14 +100,18 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 //                swipeRefreshLayout.setRefreshing(false);
 //                endlessRecyclerViewOnScrollListener.setLoading(false);
 //                updateGridLayout();
+                Log.e("MF", "broadcastReceiver -----------onReceive");
+                getLoaderManager().restartLoader(MOVIE_LOADER, null, MovieFragment.this);
+            } else if (action.equals(MainActivity.BROADCAST_FAVORITE)) {
+                getLoaderManager().restartLoader(MOVIE_FAVORITE_LOADER, null, MovieFragment.this);
             }
         }
     };
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if ( key.equals(R.string.pref_movies_status_key)){
-            updateEmptyView();
+        if (key.equals(R.string.pref_movies_status_key)) {
+            updateEmptyView(MOVIE_LOADER);
         }
     }
 
@@ -119,9 +130,32 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.e("MF", "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mMovieNetHelper = new MovieNetHelper(getContext());
+        favoriteService = new FavoriteService(getActivity());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        switch (itemId) {
+            case R.id.popular:
+                sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_popular_key)).commit();
+                mMovieNetHelper.updateMovies(Utility.getPreferredSort(getActivity()));
+
+                return true;
+            case R.id.rated:
+                sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_rated_key)).commit();
+                mMovieNetHelper.updateMovies(Utility.getPreferredSort(getActivity()));
+
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -141,7 +175,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
     }
-
 
 
     private void updateMovie() {
@@ -166,7 +199,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         Log.e("MF", "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
 
-        mMovieNetHelper.updateMovies(Utility.getPreferredSort(getContext()));
+//        mMovieNetHelper.updateMovies(Utility.getPreferredSort(getContext()));
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_movie);
         mEmptyView = (TextView) rootView.findViewById(R.id.recyclerview_movie_empty);
@@ -181,12 +214,23 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
         // The MovieAdapter will take data from a source and
         // use it to populate the RecyclerView it's attached to.
-        mMovieAdapter = new MovieAdapter(getActivity(), new MovieAdapter.MovieAdapterOnClickHandler(){
+        mMovieAdapter = new MovieAdapter(getActivity(), new MovieAdapter.MovieAdapterOnClickHandler() {
 
             @Override
-            public void onClick(long id, MovieAdapter.MovieAdapterViewHolder vh) {
+            public void onFavoriteClick(long id) {
+                if (favoriteService.isFavorite(id)) {
+                    favoriteService.removeFromFavorite(id);
+                    Snackbar.make(rootView, "Removed from favorite", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    favoriteService.addToFavorite(id);
+                    Snackbar.make(rootView, "Added to favorite", Snackbar.LENGTH_SHORT).show();
+                }
+            }
 
-                ((Callback)getActivity())
+            @Override
+            public void onImageClick(long id, MovieAdapter.MovieAdapterViewHolder vh) {
+
+                ((Callback) getActivity())
                         .onItemSelected(id, MovieContract.MovieEntry.buildMovieUri(id), vh);
                 mPosition = vh.getAdapterPosition();
             }
@@ -203,7 +247,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
-                        if (0 == mRecyclerView.computeVerticalScrollOffset()){
+                        if (0 == mRecyclerView.computeVerticalScrollOffset()) {
                             appbarView.setElevation(0);
                         } else {
                             appbarView.setElevation(appbarView.getTargetElevation());
@@ -218,22 +262,35 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.e("MF", "onActivityCreated");
         // We hold for transition here just in-case the activity
         // needs to be re-created. In a standard return transition,
         // this doesn't actually make a difference.
-        if ( mHoldForTransition ) {
+        if (mHoldForTransition) {
             getActivity().supportPostponeEnterTransition();
         }
-        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        Bundle arguments = getArguments();
+        if (null != arguments) {
+            getLoaderManager().initLoader(MOVIE_FAVORITE_LOADER, null, this);
+        } else {
+            getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        }
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 
-        Uri uri = Utility.getSortedUri(getContext());
-        if (null == uri) {
-            throw new IllegalStateException("Unknown sort.");
+        Uri uri;
+        if (id == MOVIE_LOADER) {
+            uri = Utility.getSortedUri(getContext());
+            if (null == uri) {
+                throw new IllegalStateException("Unknown sort.");
+            }
+        } else if (id == MOVIE_FAVORITE_LOADER) {
+            uri = MovieContract.FavoriteEntry.CONTENT_URI;
+        } else {
+            throw new NullPointerException("Uri is not initialized");
         }
 
         return new CursorLoader(getActivity(),
@@ -247,8 +304,9 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mMovieAdapter.swapCursor(cursor);
-        updateEmptyView();
-        if ( cursor.getCount() == 0 ) {
+        updateEmptyView(loader.getId());
+        mRecyclerView.setVisibility(View.VISIBLE);
+        if (cursor.getCount() == 0) {
             getActivity().supportStartPostponedEnterTransition();
         } else {
             mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -283,33 +341,38 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         }
     }
 
-    public void onSortChanged() {
-        updateMovie();
-        Loader loader = new Loader(getContext());
-        loader.startLoading();
-    }
+//    public void onSortChanged() {
+//        updateMovie();
+//        Loader loader = new Loader(getContext());
+//        loader.startLoading();
+//    }
 
-    private void updateEmptyView(){
-        if (mMovieAdapter.getItemCount() == 0){
+    private void updateEmptyView(int loader_id) {
+        if (mMovieAdapter.getItemCount() == 0) {
             TextView tv = (TextView) getView().findViewById(R.id.recyclerview_movie_empty);
-            if (null != tv){
-                // if cursor is empty, why? do we have an invalid location
+            if (null != tv) {
                 int message = R.string.empty_movie_list;
-                @MovieNetHelper.MoviesStatus int movies_status = Utility.getMoviesStatus(getActivity());
-                switch (movies_status) {
-                    case MovieNetHelper.MOVIES_STATUS_SERVER_DOWN:
-                        message = R.string.empty_movie_list_server_down;
-                        break;
-                    case MovieNetHelper.MOVIES_STATUS_SERVER_INVALID:
-                        message = R.string.empty_movie_list_server_error;
-                        break;
-                    default:
-                        if (!Utility.isNetworkAvailable(getActivity())) {
-                            message = R.string.empty_movie_list_no_network;
-                        }
+                if (loader_id == MOVIE_LOADER) {
+                    // if cursor is empty, why? do we have an invalid movie
+                    @MovieNetHelper.MoviesStatus int movies_status = Utility.getMoviesStatus(getActivity());
+                    switch (movies_status) {
+                        case MovieNetHelper.MOVIES_STATUS_SERVER_DOWN:
+                            message = R.string.empty_movie_list_server_down;
+                            break;
+                        case MovieNetHelper.MOVIES_STATUS_SERVER_INVALID:
+                            message = R.string.empty_movie_list_server_error;
+                            break;
+                        default:
+                            if (!Utility.isNetworkAvailable(getActivity())) {
+                                message = R.string.empty_movie_list_no_network;
+                            }
+                    }
+                } else if (loader_id == MOVIE_FAVORITE_LOADER) {
+                    message = R.string.empty_movie_favorite_list;
                 }
                 tv.setText(message);
             }
+
         }
     }
 }

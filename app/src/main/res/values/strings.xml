@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Pop Movies</string>
+    <string name="home">Home</string>
+    <string name="favorite">Favorite</string>
     <string name="title_activity_detail">Detail</string>
     <string name="detail_poster_transition_name" translatable="false">TN_DetailPoster</string>
 
@@ -20,6 +22,7 @@
     <string name="empty_movie_list_no_network">No Movie Information Available. The network is not available to fetch weather data.</string>
     <string name="empty_movie_list_server_down">No Movie information available. The server is not returning data.</string>
     <string name="empty_movie_list_server_error">No Movie information available. The server is not returning valid data. Please check for an updated version.</string>
+    <string name="empty_movie_favorite_list">No Favorite Movie.</string>
 
     <!-- Error messages -->
     <string name="error_failed_to_update_movies">Failed to update movies</string>

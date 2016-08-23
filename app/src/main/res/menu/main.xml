@@ -7,7 +7,7 @@
     <item android:id="@+id/action_show_sort"
           android:title="@string/pref_sort_key"
           android:icon="@drawable/ic_sort"
-          app:showAsAction="ifRoom" >
+          app:showAsAction="always" >
         <menu>
             <item
                 android:id="@+id/popular"
@@ -21,10 +21,4 @@
                 app:showAsAction="never"/>
         </menu>
     </item>
-
-    <item
-        android:id="@+id/action_setting"
-        android:title="@string/pref_favorite"
-        android:icon="@drawable/ic_menu"
-        app:showAsAction="always"/>
 </menu>
