@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -27,7 +26,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -135,27 +133,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         setHasOptionsMenu(true);
         mMovieNetHelper = new MovieNetHelper(getContext());
         favoriteService = new FavoriteService(getActivity());
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        switch (itemId) {
-            case R.id.popular:
-                sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_popular_key)).commit();
-                mMovieNetHelper.updateMovies(Utility.getPreferredSort(getActivity()));
-
-                return true;
-            case R.id.rated:
-                sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_rated_key)).commit();
-                mMovieNetHelper.updateMovies(Utility.getPreferredSort(getActivity()));
-
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

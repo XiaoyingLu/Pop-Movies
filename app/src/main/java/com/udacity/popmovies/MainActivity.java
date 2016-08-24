@@ -1,8 +1,10 @@
 package com.udacity.popmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     private boolean mTwoPane;
     private ScrollView mDetailFragment;
     private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
                 mDrawerLayout.openDrawer(GravityCompat.START);
             }
         });
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
         mSort = Utility.getPreferredSort(this);
 
@@ -135,11 +138,41 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        switch (itemId) {
+            case R.id.popular:
+                sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_popular_key)).commit();
+                mMovieNetHelper.updateMovies(Utility.getPreferredSort(this));
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_movie, new MovieFragment())
+                        .commit();
+                return true;
+            case R.id.rated:
+                sharedPrefs.edit().putString(getString(R.string.pref_sort_key), getString(R.string.pref_rated_key)).commit();
+                mMovieNetHelper.updateMovies(Utility.getPreferredSort(this));
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_movie, new MovieFragment())
+                        .commit();
+                return true;
+        }
+
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         item.setChecked(true);
+
         switch (item.getItemId()) {
             case R.id.drawer_home:
                 mDrawerLayout.closeDrawers();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_movie, new MovieFragment())
+                        .commit();
                 return true;
             case R.id.drawer_favorite:
                 mDrawerLayout.closeDrawers();
