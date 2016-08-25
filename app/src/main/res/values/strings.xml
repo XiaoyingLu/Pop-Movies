@@ -4,6 +4,10 @@
     <string name="favorite">Favorite</string>
     <string name="title_activity_detail">Detail</string>
     <string name="detail_poster_transition_name" translatable="false">TN_DetailPoster</string>
+    <string name="footer_pull_to_load">Pull to load</string>
+    <string name="footer_isloading">Loading...</string>
+    <string name="footer_load_error">Error! Please click to reload.</string>
+    <string name="footer_no_more">No more Movies</string>
 
     <string name="popular">most popular</string>
     <string name="rated">highest rated</string>
@@ -14,6 +18,7 @@
     <string name="pref_sort_class_key" translatable="false">sort_class</string>
     <string name="pref_sort_default" translatable="false">popularity.desc</string>
     <string name="pref_favorite" translatable="false">My favorites</string>
+    <string name="pref_movies_total_results" translatable="false">total_results</string>
 
     <!-- Key name for storing location status in SharedPreferences -->
     <string name="pref_movies_status_key" translatable="false">movies-status</string>
@@ -26,6 +31,7 @@
 
     <!-- Error messages -->
     <string name="error_failed_to_update_movies">Failed to update movies</string>
+
     <string name="content_description_movie_backdrop">Movie backdrop</string>
     <string name="movie_item_btn_favorite_desc">Movie favorite button</string>
     <string name="movie_overview_title">Overview</string>

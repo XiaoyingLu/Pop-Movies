@@ -70,4 +70,9 @@ public class Utility {
                 MovieNetHelper.MOVIES_STATUS_UNKNOWN);
         spe.apply(); // not commit() cause this  method will be used in the UI thread
     }
+
+    public static long getTotalMoviesNum(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getLong(context.getString(R.string.pref_movies_total_results), 0);
+    }
 }

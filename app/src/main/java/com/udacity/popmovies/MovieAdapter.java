@@ -5,21 +5,23 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 /**
  * Created by Administrator on 2016/6/4.
  */
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     final String PICTURE_BASE_URL = "http://image.tmdb.org/t/p/";
     final String PICTURE_SIZE = "w185";
+    private static final int FOOTER_VIEW = 1;
     private final Context mContext;
     private final MovieAdapterOnClickHandler mClickHandler;
     private final View mEmptyView;
@@ -27,7 +29,38 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private final DataSetObserver mDataSetObserver;
     private final FavoriteService favoriteService;
 
-    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder{
+    public static final int PULL_TO_LOAD_MORE = 0;
+    public static final int IS_LOADING = 1;
+    public static final int LOAD_ERROR = 2;
+    public static final int NO_MORE_LOAD = 3;
+    public int load_more_status = PULL_TO_LOAD_MORE;
+    private boolean mIsFooterVisible = false;
+
+    // Define a view holder for Footer view
+    public class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        private final ProgressBar mFooterProgressbar;
+        private final TextView mFooterLoadText;
+        private final View mFooterView;
+
+        public FooterViewHolder(View itemView) {
+            super(itemView);
+            mFooterView = itemView.findViewById(R.id.load_footer_view);
+            mFooterProgressbar = (ProgressBar) itemView.findViewById(R.id.load_footer_progressbar);
+            mFooterLoadText = (TextView) itemView.findViewById(R.id.load_footer_text);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (load_more_status == LOAD_ERROR) {
+                        // Click to reload
+                        mClickHandler.onFooterClick();
+                    }
+                }
+            });
+        }
+    }
+
+    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder {
         public final ImageView mImageView;
         private final ImageButton mfavoriteButton;
         private MovieAdapterViewHolder vh;
@@ -58,21 +91,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
                 }
             });
         }
-//
-//        @Override
-//        public void onClick(View view) {
-//            int adapterPosition = getAdapterPosition();
-//            mCursor.moveToPosition(adapterPosition);
-//            mClickHandler.onFavoriteClick(mCursor.getLong(MovieFragment.COL_MOVIE_ID));
-//            mClickHandler.onImageClick(mCursor.getLong(MovieFragment.COL_MOVIE_ID), this);
-//        }
 
     }
 
     public static interface MovieAdapterOnClickHandler {
 
         void onFavoriteClick(long id);
+
         void onImageClick(long id, MovieAdapterViewHolder vh);
+
+        void onFooterClick();
     }
 
     public MovieAdapter(Context context, MovieAdapterOnClickHandler dh, View emptyView) {
@@ -87,40 +115,72 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     @Override
-    public MovieAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.e("MA", "onCreateViewHolder");
-        if (parent instanceof RecyclerView) {
-            int layoutId = R.layout.list_item_movie;
-            View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
-            view.setFocusable(true);
-            return new MovieAdapterViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
+        if (viewType == FOOTER_VIEW) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_footer_view, parent, false);
+            return new FooterViewHolder(view);
+        }
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_movie, parent, false);
+        view.setFocusable(true);
+        return new MovieAdapterViewHolder(view);
+
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof FooterViewHolder) {
+            FooterViewHolder vh = (FooterViewHolder) holder;
+            if (!mIsFooterVisible){
+                vh.mFooterView.getLayoutParams().height = 0;
+            } else {
+                vh.mFooterView.getLayoutParams().height = vh.mFooterView.getMeasuredHeight();
+                if (load_more_status == IS_LOADING) {
+                    vh.mFooterLoadText.setText(R.string.footer_isloading);
+                    vh.mFooterProgressbar.setVisibility(View.VISIBLE);
+                } else if (load_more_status == LOAD_ERROR) {
+                    vh.mFooterLoadText.setText(R.string.footer_load_error);
+                    vh.mFooterProgressbar.setVisibility(View.INVISIBLE);
+                } else if (load_more_status == NO_MORE_LOAD) {
+                    vh.mFooterLoadText.setText(R.string.footer_no_more);
+                    vh.mFooterProgressbar.setVisibility(View.INVISIBLE);
+                } else {
+                    vh.mFooterLoadText.setText(R.string.footer_pull_to_load);
+                    vh.mFooterProgressbar.setVisibility(View.INVISIBLE);
+                }
+            }
+        } else if (holder instanceof MovieAdapterViewHolder) {
+            MovieAdapterViewHolder vh = (MovieAdapterViewHolder) holder;
+
+            mCursor.moveToPosition(position);
+            String poster_path = mCursor.getString(MovieFragment.COL_MOVIE_POSTER_PATH);
+            long id = mCursor.getLong(MovieFragment.COL_MOVIE_ID);
+            vh.mfavoriteButton.setSelected(favoriteService.isFavorite(id));
+
+            Picasso.with(mContext)
+                    .load(PICTURE_BASE_URL + PICTURE_SIZE + "//" + poster_path)
+                    .into(vh.mImageView);
+
+            // this enables better animations. even if we lose state due to a device rotation,
+            // the animator can use this to re-find the original view
+            ViewCompat.setTransitionName(vh.mImageView, "posterView" + position);
         } else {
             throw new RuntimeException("Not bound to RecyclerViewSelection");
         }
     }
 
     @Override
-    public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
-        Log.e("MA", "onBindViewHolder");
-        mCursor.moveToPosition(position);
-        String poster_path = mCursor.getString(MovieFragment.COL_MOVIE_POSTER_PATH);
-        long id = mCursor.getLong(MovieFragment.COL_MOVIE_ID);
-        Log.e("MA", String.valueOf(id));
-        holder.mfavoriteButton.setSelected(favoriteService.isFavorite(id));
-
-        Picasso.with(mContext)
-                .load(PICTURE_BASE_URL + PICTURE_SIZE + "//" + poster_path)
-                .into(holder.mImageView);
-
-        // this enables better animations. even if we lose state due to a device rotation,
-        // the animator can use this to re-find the original view
-        ViewCompat.setTransitionName(holder.mImageView, "posterView" + position);
+    public int getItemCount() {
+        if (null == mCursor) return 0;
+        return mCursor.getCount() + 1;
     }
 
     @Override
-    public int getItemCount() {
-        if (null == mCursor) return 0;
-        return mCursor.getCount();
+    public int getItemViewType(int position) {
+        if (position == mCursor.getCount()) {
+            return FOOTER_VIEW;
+        }
+        return super.getItemViewType(position);
     }
 
     public void swapCursor(Cursor newCursor) {
@@ -169,5 +229,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             super.onInvalidated();
             notifyDataSetChanged();
         }
+    }
+
+    public void updateFooterView(int status) {
+        load_more_status = status;
+        notifyDataSetChanged();
+    }
+
+    public void setFooterVisibility(boolean isFooterVisible) {
+        mIsFooterVisible = isFooterVisible;
     }
 }

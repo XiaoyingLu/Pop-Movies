@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         item.setChecked(true);
-
         switch (item.getItemId()) {
             case R.id.drawer_home:
                 mDrawerLayout.closeDrawers();
@@ -177,12 +176,12 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
             case R.id.drawer_favorite:
                 mDrawerLayout.closeDrawers();
 
-                Bundle args = new Bundle();
-                args.putInt(MovieFragment.FAVORIE_LOADER, MovieFragment.MOVIE_FAVORITE_LOADER);
-                MovieFragment movieFragment = new MovieFragment();
-                movieFragment.setArguments(args);
+//                Bundle args = new Bundle();
+//                args.putInt(MovieFragment.FAVORIE_LOADER, MovieFragment.MOVIE_FAVORITE_LOADER);
+//                MovieFragment movieFragment = new MovieFragment();
+//                movieFragment.setArguments(args);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_movie, movieFragment)
+                        .replace(R.id.fragment_movie, new FavoriteFragment())
                         .commit();
 
 //                Intent intent = new Intent(BROADCAST_FAVORITE);

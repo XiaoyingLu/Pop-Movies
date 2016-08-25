@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
@@ -30,7 +31,7 @@ import rx.schedulers.Schedulers;
  */
 public class MovieNetHelper {
 
-    private static volatile MovieApi movieApi;
+    private static final int PAGE_SIZE = 20;
 
     private final Context mContext;
     private volatile boolean loading = false;
@@ -57,7 +58,37 @@ public class MovieNetHelper {
         mSortedUri = Utility.getSortedUri(context);
     }
 
-    public void updateMovies(String sort){
+    public void loadMoreMovies() {
+        String sort = Utility.getPreferredSort(mContext);
+        Uri uri = Utility.getSortedUri(mContext);
+        callDiscoverMovies(sort, getCurrentPage(uri) + 1);
+    }
+
+    static private void saveTotalResults(Context c, Long totalResults) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putLong(c.getString(R.string.pref_movies_total_results), totalResults);
+        spe.apply();
+    }
+
+    public int getCurrentPage(Uri uri) {
+        Cursor movies = mContext.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
+
+        int currentPage = 1;
+        if (movies != null) {
+            currentPage = (movies.getCount() - 1) / PAGE_SIZE + 1;
+            movies.close();
+        }
+        return currentPage;
+    }
+
+    public void updateMovies(String sort) {
         callDiscoverMovies(sort, null);
     }
 
@@ -66,7 +97,7 @@ public class MovieNetHelper {
 
         Uri uri = Utility.getSortedUri(mContext);
         if (null == uri) {
-            Log.e(LOG_TAG, "Wrong uri: " +uri);
+            Log.e(LOG_TAG, "Wrong uri: " + uri);
             return;
         }
         Log.e(LOG_TAG, uri.toString());
@@ -83,8 +114,10 @@ public class MovieNetHelper {
                                     null,
                                     null
                             );
+                            long totalResults = movieDiscoverResponse.getTotalResults();
+                            saveTotalResults(mContext, totalResults);
                         }
-                        Log.e(LOG_TAG, "page == " + page + ", " + movieDiscoverResponse.getResults().toString());
+//                        Log.e(LOG_TAG, "page == " + page + ", " + movieDiscoverResponse.getResults().toString());
                         return movieDiscoverResponse.getResults();
                     }
                 })
@@ -102,13 +135,10 @@ public class MovieNetHelper {
                                     movies.get(i).toContentValues());
 
                             long movie_id = MovieContract.MovieEntry.getIdFromUri(movieUri);
-                            Log.e(LOG_TAG, String.valueOf(movie_id));
                             ContentValues entryValues = new ContentValues();
                             entryValues.put(MovieContract.COLUMN_MOVIE_ID_KEY, movie_id);
                             mContext.getContentResolver().insert(uri, entryValues);
-                            Log.e(LOG_TAG, uri.toString());
                         }
-                        Log.e(LOG_TAG, movies.toString());
                         return true;
                     }
                 })
@@ -201,14 +231,14 @@ public class MovieNetHelper {
      * Sets the movies status into shared preference. This function should not be called from
      * the UI thread because it uses commit to write to the shared preferences.
      *
-     * @param c              Context to get the PreferenceManager from.
+     * @param c            Context to get the PreferenceManager from.
      * @param moviesStatus The IntDef value to set
      */
     static private void setMoviesStatus(Context c, @MoviesStatus int moviesStatus) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor spe = sp.edit();
         spe.putInt(c.getString(R.string.pref_movies_status_key), moviesStatus);
-        spe.commit();
+        spe.apply();
     }
 
 //    public void callMovieVideos(long id, MovieVideosAdapter movieVideosAdapter) {
