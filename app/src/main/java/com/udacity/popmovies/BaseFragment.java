@@ -253,6 +253,12 @@ public abstract class BaseFragment extends Fragment implements LoaderManager.Loa
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mMovieAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (null != mRecyclerView) {

@@ -33,7 +33,7 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static final int IS_LOADING = 1;
     public static final int LOAD_ERROR = 2;
     public static final int NO_MORE_LOAD = 3;
-    public int load_more_status = PULL_TO_LOAD_MORE;
+    public int load_more_status = IS_LOADING;
     private boolean mIsFooterVisible = false;
 
     // Define a view holder for Footer view
@@ -134,7 +134,11 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             if (!mIsFooterVisible){
                 vh.mFooterView.getLayoutParams().height = 0;
             } else {
-                vh.mFooterView.getLayoutParams().height = vh.mFooterView.getMeasuredHeight();
+                int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+                int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+                vh.mFooterView.measure(w, h);
+                int height = vh.mFooterView.getMeasuredHeight();
+                vh.mFooterView.getLayoutParams().height = height;
                 if (load_more_status == IS_LOADING) {
                     vh.mFooterLoadText.setText(R.string.footer_isloading);
                     vh.mFooterProgressbar.setVisibility(View.VISIBLE);

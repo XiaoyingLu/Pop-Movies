@@ -83,6 +83,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private long mId = 0;
     private ImageButton mMovieFavorite;
     private FavoriteService favoriteService;
+    private CardView mCardMovieOverview;
+    private CardView mCardMovieDetail;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -115,12 +117,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
+        mCardMovieDetail = (CardView) rootView.findViewById(R.id.movie_detail_container);
         mMoviePoster = (ImageView) rootView.findViewById(R.id.imageview_poster);
         mMovieTitle = (TextView) rootView.findViewById(R.id.textview_title);
         mMovieDate = (TextView) rootView.findViewById(R.id.textview_date);
         mMovieVoteRate = (RatingBar) rootView.findViewById(R.id.rating_vote);
         mMovieVoteAverage = (TextView) rootView.findViewById(R.id.textview_vote_average);
         mMovieFavorite = (ImageButton) rootView.findViewById(R.id.movie_favorite_button);
+        mCardMovieOverview = (CardView) rootView.findViewById(R.id.movie_overview_container);
         mMovieOverview = (TextView) rootView.findViewById(R.id.textview_overview);
         mCardMovieVideos = (CardView) rootView.findViewById(R.id.movie_videos_container);
         mMovieVideos = (RecyclerView) rootView.findViewById(R.id.recyclerview_movie_videos);
@@ -172,6 +176,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 LinearLayoutManager.HORIZONTAL, false));
         mMovieVideos.addItemDecoration(new ItemOffsetDecoration(getActivity(), R.dimen.movie_video_item_offset));
                 mMovieVideos.setHasFixedSize(true);
+        updateCardMovieVideos();
     }
 
     private void callMovieVideos(long id) {
@@ -189,6 +194,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     @Override
                     public void onError(Throwable e) {
                         Log.e(LOG_TAG, e.getMessage());
+                        updateCardMovieVideos();
                     }
 
                     @Override
@@ -224,6 +230,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mMovieReviews.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.VERTICAL, false));
         mMovieReviews.setHasFixedSize(true);
+        updateCardMovieReviews();
     }
 
     private void callMovieReviews(long id) {
@@ -241,6 +248,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     @Override
                     public void onError(Throwable e) {
                         Log.e(LOG_TAG, e.getMessage());
+                        updateCardMovieReviews();
                     }
 
                     @Override

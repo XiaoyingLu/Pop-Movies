@@ -324,4 +324,10 @@ public class MovieProvider extends ContentProvider {
                 return super.bulkInsert(uri, values);
         }
     }
+
+    @Override
+    public void shutdown() {
+        mOpenHelper.close();
+        super.shutdown();
+    }
 }

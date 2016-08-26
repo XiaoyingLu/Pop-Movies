@@ -29,8 +29,4 @@
         <item name="android:layout_width">@dimen/abc_action_button_min_height_material</item>
         <item name="android:src">@drawable/selector_favorite_button</item>
     </style>
-
-    <style name="ratingbar" parent="Widget.AppCompat.RatingBar">
-        <item name="android:progressDrawable">@drawable/rating_bar</item>
-    </style>
 </resources>

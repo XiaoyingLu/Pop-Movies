@@ -112,7 +112,7 @@ public class MovieFragment extends BaseFragment implements
             @Override
             public void onLoad(int totalItemCount) {
                 mMovieAdapter.setFooterVisibility(true);
-                if (totalItemCount == Utility.getTotalMoviesNum(getActivity())) {
+                if (totalItemCount == Utility.getTotalMoviesNum(getActivity()) + 1) {
                     mMovieAdapter.updateFooterView(MovieAdapter.NO_MORE_LOAD);
                     return;
                 }
